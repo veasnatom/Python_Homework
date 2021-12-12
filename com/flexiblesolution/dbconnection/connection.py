@@ -11,7 +11,7 @@ db = Database()
 db.bind(provider='postgres', user='postgres', password='postgres', host='localhost', database='postgres')
 user_class = getUser(db)
 submit_case_class = getSubmitCase(db,user_class)
-
+#test
 
 set_sql_debug(True)
 db.generate_mapping(create_tables=True)
