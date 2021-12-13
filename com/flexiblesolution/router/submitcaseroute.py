@@ -75,11 +75,11 @@ def get_user_by_id(id:int):
     except BaseException as err:
         return "Error: {0}".format(err)
 
-@submit_case_router.post('/update_submit_case')
-def update_submit_case(request: SubmitCaseDto):
+@submit_case_router.put('/update_submit_case')
+def update_submit_case(id:int,request: SubmitCaseDto):
     try:
         with db_session:
-            submit_case = submit_case_class.get(id=request.id)
+            submit_case = submit_case_class.get(id=id)
             if submit_case == None:
                 return 'Id not found.'
             else:
@@ -88,7 +88,7 @@ def update_submit_case(request: SubmitCaseDto):
     except BaseException as err:
         return "Error: {0}".format(err)
 
-@submit_case_router.post('/delete_submit_case')
+@submit_case_router.delete('/delete_submit_case')
 def delete_submit_case(id:int):
     try:
         with db_session:

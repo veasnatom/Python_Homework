@@ -32,11 +32,11 @@ def get_user_by_id(id:int):
             return result
     except BaseException as err:
         return "Error: {0}".format(err)
-@user_router.post('/update_user')
-def update_user(request:UserDto):
+@user_router.put('/update_user')
+def update_user(id:int,request:UserDto):
     try:
         with db_session:
-            user = user_class.get(id=request.id)
+            user = user_class.get(id=id)
             if user == None:
                 return 'Id not found.'
             else:
@@ -44,7 +44,7 @@ def update_user(request:UserDto):
                 return 'Updated successfully'
     except BaseException as err:
         return "Error: {0}".format(err)
-@user_router.post('/delete_user')
+@user_router.delete('/delete_user')
 def delete_user(id:int):
     try:
         with db_session:
