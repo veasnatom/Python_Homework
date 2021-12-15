@@ -3,6 +3,7 @@ from pony.orm import db_session, flush
 
 from com.flexiblesolution.dbconnection.connection import user_class
 from com.flexiblesolution.dto.userdto import UserDto
+from com.flexiblesolution.utils.validate_utils import ValidateUtils
 
 user_router = APIRouter(
     prefix='/user',
@@ -12,6 +13,7 @@ user_router = APIRouter(
 @user_router.post('/create_user')
 def create_user(request:UserDto):
     try:
+        ValidateUtils.validateInput(request)
         with db_session:
             user = user_class(name=request.name, email=request.email, phone=request.phone, password=request.password, created_at=request.created_at,
                   updated_at=request.updated_at)
