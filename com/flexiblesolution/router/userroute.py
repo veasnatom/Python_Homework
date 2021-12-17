@@ -41,13 +41,17 @@ def get_user_by_id(id:int):
 @user_router.put('/update_user')
 def update_user(id:int,request:UserDto):
     try:
-        with db_session:
-            user = user_class.get(id=id)
-            if user == None:
-                return 'Id not found.'
-            else:
-                user.set(**dict(request))
-                return 'Updated successfully'
+        validate = ValidateUtils.validateInput(request)
+        if validate[0] == True:
+            with db_session:
+                user = user_class.get(id=id)
+                if user == None:
+                    return 'Id not found.'
+                else:
+                    user.set(**dict(request))
+                    return 'Updated successfully'
+        else:
+            return validate[1]
     except BaseException as err:
         return "Error: {0}".format(err)
 @user_router.delete('/delete_user')

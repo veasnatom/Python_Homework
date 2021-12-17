@@ -4,6 +4,8 @@ from pony.orm import db_session, flush
 
 from com.flexiblesolution.dbconnection.connection import user_class, submit_case_class
 from com.flexiblesolution.dto.submitcasedto import SubmitCaseDto
+from com.flexiblesolution.utils import validate_utils
+from com.flexiblesolution.utils.validate_utils import ValidateUtils
 
 submit_case_router = APIRouter(
     prefix='/submit_case',
@@ -13,30 +15,34 @@ submit_case_router = APIRouter(
 @submit_case_router.post('/create_submit_case')
 def create_submit_case(request:SubmitCaseDto):
     try:
-        with db_session:
-            submit_case = submit_case_class(owner_id=user_class.get(id=request.owner_id),
-                                            street_no=request.street_no,
-                                            house_no=request.house_no,
-                                            address=request.address,
-                                            land_width=request.land_width,
-                                            land_length=request.land_length,
-                                            land_area=request.land_area,
-                                            description=request.description,
-                                            record_type=request.record_type,
-                                            type=request.type,
-                                            created_by=user_class.get(id=request.created_by),
-                                            updated_by=user_class.get(id=request.updated_by),
-                                            created_at=request.created_at,
-                                            updated_at=request.updated_at,
-                                            deleted_at=request.deleted_at,
-                                            current_use=request.current_use,
-                                            case_status=request.case_status,
-                                            instructor_date=request.instructor_date,
-                                            due_date=request.due_date,
-                                            indication_date=request.indication_date)
+        validate = ValidateUtils.validateInput(request);
+        if validate[0] == True:
+            with db_session:
+                submit_case = submit_case_class(owner_id=user_class.get(id=request.owner_id),
+                                                street_no=request.street_no,
+                                                house_no=request.house_no,
+                                                address=request.address,
+                                                land_width=request.land_width,
+                                                land_length=request.land_length,
+                                                land_area=request.land_area,
+                                                description=request.description,
+                                                record_type=request.record_type,
+                                                type=request.type,
+                                                created_by=user_class.get(id=request.created_by),
+                                                updated_by=user_class.get(id=request.updated_by),
+                                                created_at=request.created_at,
+                                                updated_at=request.updated_at,
+                                                deleted_at=request.deleted_at,
+                                                current_use=request.current_use,
+                                                case_status=request.case_status,
+                                                instructor_date=request.instructor_date,
+                                                due_date=request.due_date,
+                                                indication_date=request.indication_date)
 
-            flush()
-            return {"id:",submit_case.id}
+                flush()
+                return {"id:",submit_case.id}
+        else:
+            return validate[1]
     except BaseException as err:
         return 'Error: {0}'.format(err)
 
@@ -78,13 +84,17 @@ def get_user_by_id(id:int):
 @submit_case_router.put('/update_submit_case')
 def update_submit_case(id:int,request: SubmitCaseDto):
     try:
-        with db_session:
-            submit_case = submit_case_class.get(id=id)
-            if submit_case == None:
-                return 'Id not found.'
-            else:
-                submit_case.set(**dict(request))
-                return 'Updated successfully'
+        validate = ValidateUtils.validateInput(request);
+        if validate[0] == True:
+            with db_session:
+                submit_case = submit_case_class.get(id=id)
+                if submit_case == None:
+                    return 'Id not found.'
+                else:
+                    submit_case.set(**dict(request))
+                    return 'Updated successfully'
+        else:
+            return validate[1]
     except BaseException as err:
         return "Error: {0}".format(err)
 
