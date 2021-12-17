@@ -13,12 +13,16 @@ user_router = APIRouter(
 @user_router.post('/create_user')
 def create_user(request:UserDto):
     try:
-        ValidateUtils.validateInput(request)
-        with db_session:
-            user = user_class(name=request.name, email=request.email, phone=request.phone, password=request.password, created_at=request.created_at,
-                  updated_at=request.updated_at)
-            flush()
-        return {"id":user.id}
+        validate = ValidateUtils.validateInput(request)
+        if(validate[0] == True):
+            with db_session:
+                user = user_class(name=request.name, email=request.email, phone=request.phone, password=request.password, created_at=request.created_at,
+                      updated_at=request.updated_at)
+                flush()
+            return {"id":user.id}
+        else:
+            return validate[1]
+
     except BaseException as err:
         return "Error: {0}".format(err)
 
