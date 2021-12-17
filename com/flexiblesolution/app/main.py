@@ -10,7 +10,7 @@ app.include_router(submit_case_router)
 
 
 '''
-@app.post('/create_user')
+@app.post('/create_user') 
 def create_user(request:UserDto):
     try:
         with db_session:
