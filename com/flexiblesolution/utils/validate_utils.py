@@ -32,13 +32,7 @@ class ValidateUtils:
         validate_email = ValidateUtils.__validateEmail(user.email)
         if validate_email[0] == False:
             return validate_email
-        #validate_datetime
-        validate_created_at = ValidateUtils.__validate_date_time(user.created_at)
-        if validate_created_at[0] == False:
-            return validate_created_at
-        validate_updated_at = ValidateUtils.__validate_date_time(user.updated_at)
-        if validate_updated_at[0] == False:
-            return validate_updated_at
+
         return True,None
 
 
@@ -60,14 +54,7 @@ class ValidateUtils:
         else:
             return False,'Invalid Email'
 
-    @staticmethod
-    def __validate_date_time(date_string:datetime):
-        format = "%Y-%m-%dT%H:%M:%S"
-        try:
-            datetime.strptime(date_string, format)
-            return True,None
-        except BaseException as err:
-            return False,'Invalid format YYYY-MM-DDTHH:mm:ss'
+
 #end user validate section
 #Submit_Case validate section
     @staticmethod
