@@ -1,15 +1,16 @@
 from datetime import timedelta
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from fastapi.security import OAuth2PasswordRequestForm
+
 from passlib.context import CryptContext
 from pony.orm import db_session, flush
 
-
 from com.flexiblesolution.dbconnection.connection import user_class
-from com.flexiblesolution.dto.logindto import LoginDto
 from com.flexiblesolution.dto.userdto import UserDto
-from com.flexiblesolution.token.usertoken import ACCESS_TOKEN_EXPIRE_MINUTE, create_access_token
 from com.flexiblesolution.utils.validate_utils import ValidateUtils
+from com.flexiblesolution.token.oaut2 import get_current_user
+from com.flexiblesolution.token.usertoken import ACCESS_TOKEN_EXPIRE_MINUTE, create_access_token
 
 user_router = APIRouter(
     prefix='/user',
@@ -38,7 +39,7 @@ def create_user(request:UserDto):
         return "Error: {0}".format(err)
 
 @user_router.get('/{id}')
-def get_user_by_id(id:int):
+def get_user_by_id(id:int,get_current_user:UserDto=Depends(get_current_user)):
     try:
         with db_session:
             user = user_class.get(id=id)
@@ -85,8 +86,8 @@ def delete_user(id:int):
     except BaseException as err:
         return "Error: {0}".format(err)
 
-@user_router.post('login')
-def login(request:LoginDto):
+@user_router.post('/login')
+def login(request:OAuth2PasswordRequestForm=Depends()):
     with db_session:
         user = user_class.get(email=request.username)
     if user == None:
@@ -97,5 +98,5 @@ def login(request:LoginDto):
     #general access token
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTE)
     access_token = create_access_token(data={"sub":user.email})
-    return access_token
+    return {"access_token":access_token,"token_type":"bearer"}
 
