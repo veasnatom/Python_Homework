@@ -20,7 +20,7 @@ user_router = APIRouter(
 pwd_context = CryptContext(schemes=['bcrypt'],deprecated="auto")
 
 @user_router.post('/create_user')
-def create_user(request:UserDto):
+def create_user(request:UserDto,get_current_user:UserDto=Depends(get_current_user)):
     try:
         validate = ValidateUtils.validateInput(request)
         if(validate[0] == True):
@@ -51,14 +51,14 @@ def get_user_by_id(id:int,get_current_user:UserDto=Depends(get_current_user)):
     except BaseException as err:
         return "Error: {0}".format(err)
 @user_router.put('/update_user')
-def update_user(request:UserDto):
+def update_user(id:int,request:UserDto,get_current_user:UserDto=Depends(get_current_user)):
     try:
         if request.id == None:
             return 'id is required.'
         validate = ValidateUtils.validateInput(request)
         if validate[0] == True:
             with db_session:
-                user = user_class.get(id=request.id)
+                user = user_class.get(id=id)
                 if user == None:
                     return 'Id not found.'
                 else:
@@ -74,7 +74,7 @@ def update_user(request:UserDto):
     except BaseException as err:
         return "Error: {0}".format(err)
 @user_router.delete('/delete_user')
-def delete_user(id:int):
+def delete_user(id:int,get_current_user:UserDto=Depends(get_current_user)):
     try:
         with db_session:
             user = user_class.get(id=id)
@@ -83,6 +83,18 @@ def delete_user(id:int):
             else:
                 user.delete()
                 return 'Deleted successfully.'
+    except BaseException as err:
+        return "Error: {0}".format(err)
+
+@user_router.get('/get_all_user/')
+def get_all_user(get_current_user:UserDto=Depends(get_current_user)):
+    try:
+        with db_session:
+            lst_user = user_class.select().order_by(user_class.name)
+            users = []
+            for u in lst_user:
+                users.append(UserDto.from_orm(u))
+        return users
     except BaseException as err:
         return "Error: {0}".format(err)
 
