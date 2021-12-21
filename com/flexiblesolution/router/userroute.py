@@ -20,7 +20,7 @@ user_router = APIRouter(
 pwd_context = CryptContext(schemes=['bcrypt'],deprecated="auto")
 
 @user_router.post('/create_user')
-def create_user(request:UserDto,get_current_user:UserDto=Depends(get_current_user)):
+def create_user(request:UserDto):
     try:
         validate = ValidateUtils.validateInput(request)
         if(validate[0] == True):
