@@ -6,7 +6,7 @@ from passlib.context import CryptContext
 from pony.orm import db_session, flush
 
 from com.flexiblesolution.dbconnection.connection import user_class
-from com.flexiblesolution.dto.tokendatadto import TokenData
+from com.flexiblesolution.dto.tokendatadto import TokenDataDto
 from com.flexiblesolution.dto.tokendto import TokenDto
 from com.flexiblesolution.dto.userdto import UserDto
 from com.flexiblesolution.token.oaut2 import get_current_user
@@ -40,7 +40,7 @@ def create_user(request:UserDto):
         return "Error: {0}".format(err)
 
 @user_router.get('/{id}')
-def get_user_by_id(id:int,get_current_user:TokenData=Depends(get_current_user)):
+def get_user_by_id(id:int, get_current_user:TokenDataDto=Depends(get_current_user)):
     try:
         with db_session:
             user = user_class.get(id=id)
@@ -52,7 +52,7 @@ def get_user_by_id(id:int,get_current_user:TokenData=Depends(get_current_user)):
     except BaseException as err:
         return "Error: {0}".format(err)
 @user_router.put('/update_user')
-def update_user(id:int,request:TokenData,get_current_user:UserDto=Depends(get_current_user)):
+def update_user(id:int, request:TokenDataDto, get_current_user:UserDto=Depends(get_current_user)):
     try:
         if request.id == None:
             return 'id is required.'
@@ -75,7 +75,7 @@ def update_user(id:int,request:TokenData,get_current_user:UserDto=Depends(get_cu
     except BaseException as err:
         return "Error: {0}".format(err)
 @user_router.delete('/delete_user')
-def delete_user(id:int,get_current_user:TokenData=Depends(get_current_user)):
+def delete_user(id:int, get_current_user:TokenDataDto=Depends(get_current_user)):
     try:
         with db_session:
             user = user_class.get(id=id)
@@ -88,7 +88,7 @@ def delete_user(id:int,get_current_user:TokenData=Depends(get_current_user)):
         return "Error: {0}".format(err)
 
 @user_router.get('/get_all_user/')
-def get_all_user(get_current_user:TokenData=Depends(get_current_user)):
+def get_all_user(get_current_user:TokenDataDto=Depends(get_current_user)):
     try:
         with db_session:
             lst_user = user_class.select().order_by(user_class.name)

@@ -4,7 +4,7 @@ from typing import Optional
 from fastapi import HTTPException
 from jose import jwt, JWTError
 
-from com.flexiblesolution.dto.tokendatadto import TokenData
+from com.flexiblesolution.dto.tokendatadto import TokenDataDto
 
 SECRET_KEY = 'flexiblesolution'
 ALGORITHM = 'HS256'
@@ -24,6 +24,6 @@ def verify_token(token:str,credential_exception:HTTPException):
         email:str = payload.get("sub")
         if email is None:
             raise credential_exception
-        return TokenData(email=email)
+        return TokenDataDto(email=email)
     except JWTError as err:
         raise credential_exception

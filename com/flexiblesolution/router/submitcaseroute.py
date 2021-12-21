@@ -5,7 +5,7 @@ from pony.orm import db_session, flush
 
 from com.flexiblesolution.dbconnection.connection import user_class, submit_case_class
 from com.flexiblesolution.dto.submitcasedto import SubmitCaseDto
-from com.flexiblesolution.dto.tokendatadto import TokenData
+from com.flexiblesolution.dto.tokendatadto import TokenDataDto
 from com.flexiblesolution.dto.userdto import UserDto
 from com.flexiblesolution.token.oaut2 import get_current_user
 from com.flexiblesolution.utils.validate_utils import ValidateUtils
@@ -16,7 +16,7 @@ submit_case_router = APIRouter(
 )
 
 @submit_case_router.post('/create_submit_case')
-def create_submit_case(request:SubmitCaseDto,get_current_user:TokenData=Depends(get_current_user)):
+def create_submit_case(request:SubmitCaseDto, get_current_user:TokenDataDto=Depends(get_current_user)):
     try:
         validate = ValidateUtils.validateInput(request);
         if validate[0] == True:
@@ -50,7 +50,7 @@ def create_submit_case(request:SubmitCaseDto,get_current_user:TokenData=Depends(
         return 'Error: {0}'.format(err)
 
 @submit_case_router.get('/{id}')
-def get_user_by_id(id:int,get_current_user:TokenData=Depends(get_current_user)):
+def get_user_by_id(id:int, get_current_user:TokenDataDto=Depends(get_current_user)):
     try:
         with db_session:
             submit_case = submit_case_class.get(id=id)
@@ -85,7 +85,7 @@ def get_user_by_id(id:int,get_current_user:TokenData=Depends(get_current_user)):
         return "Error: {0}".format(err)
 
 @submit_case_router.put('/update_submit_case')
-def update_submit_case(id:int,request: SubmitCaseDto,get_current_user:TokenData=Depends(get_current_user)):
+def update_submit_case(id:int, request: SubmitCaseDto, get_current_user:TokenDataDto=Depends(get_current_user)):
     try:
         validate = ValidateUtils.validateInput(request);
         if validate[0] == True:
@@ -102,7 +102,7 @@ def update_submit_case(id:int,request: SubmitCaseDto,get_current_user:TokenData=
         return "Error: {0}".format(err)
 
 @submit_case_router.get('/get_all_submit_case/')
-def get_all_submit_case(get_current_user:TokenData=Depends(get_current_user)):
+def get_all_submit_case(get_current_user:TokenDataDto=Depends(get_current_user)):
     try:
         with db_session:
             lst_submit_case = submit_case_class.select().order_by(submit_case_class.id)
@@ -136,7 +136,7 @@ def get_all_submit_case(get_current_user:TokenData=Depends(get_current_user)):
         return 'Error: {0}'.format(err)
 
 @submit_case_router.delete('/delete_submit_case')
-def delete_submit_case(id:int,get_current_user:TokenData=Depends(get_current_user)):
+def delete_submit_case(id:int, get_current_user:TokenDataDto=Depends(get_current_user)):
     try:
         with db_session:
             delete_submit_case = submit_case_class.get(id=id)
