@@ -1,16 +1,17 @@
-from datetime import timedelta
+from xml.dom import UserDataHandler
 
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
-
 from passlib.context import CryptContext
 from pony.orm import db_session, flush
 
 from com.flexiblesolution.dbconnection.connection import user_class
+from com.flexiblesolution.dto.tokendatadto import TokenData
+from com.flexiblesolution.dto.tokendto import TokenDto
 from com.flexiblesolution.dto.userdto import UserDto
-from com.flexiblesolution.utils.validate_utils import ValidateUtils
 from com.flexiblesolution.token.oaut2 import get_current_user
-from com.flexiblesolution.token.usertoken import ACCESS_TOKEN_EXPIRE_MINUTE, create_access_token
+from com.flexiblesolution.token.usertoken import create_access_token
+from com.flexiblesolution.utils.validate_utils import ValidateUtils
 
 user_router = APIRouter(
     prefix='/user',
@@ -39,7 +40,7 @@ def create_user(request:UserDto):
         return "Error: {0}".format(err)
 
 @user_router.get('/{id}')
-def get_user_by_id(id:int,get_current_user:UserDto=Depends(get_current_user)):
+def get_user_by_id(id:int,get_current_user:TokenData=Depends(get_current_user)):
     try:
         with db_session:
             user = user_class.get(id=id)
@@ -51,7 +52,7 @@ def get_user_by_id(id:int,get_current_user:UserDto=Depends(get_current_user)):
     except BaseException as err:
         return "Error: {0}".format(err)
 @user_router.put('/update_user')
-def update_user(id:int,request:UserDto,get_current_user:UserDto=Depends(get_current_user)):
+def update_user(id:int,request:TokenData,get_current_user:UserDto=Depends(get_current_user)):
     try:
         if request.id == None:
             return 'id is required.'
@@ -74,7 +75,7 @@ def update_user(id:int,request:UserDto,get_current_user:UserDto=Depends(get_curr
     except BaseException as err:
         return "Error: {0}".format(err)
 @user_router.delete('/delete_user')
-def delete_user(id:int,get_current_user:UserDto=Depends(get_current_user)):
+def delete_user(id:int,get_current_user:TokenData=Depends(get_current_user)):
     try:
         with db_session:
             user = user_class.get(id=id)
@@ -87,7 +88,7 @@ def delete_user(id:int,get_current_user:UserDto=Depends(get_current_user)):
         return "Error: {0}".format(err)
 
 @user_router.get('/get_all_user/')
-def get_all_user(get_current_user:UserDto=Depends(get_current_user)):
+def get_all_user(get_current_user:TokenData=Depends(get_current_user)):
     try:
         with db_session:
             lst_user = user_class.select().order_by(user_class.name)
@@ -108,7 +109,6 @@ def login(request:OAuth2PasswordRequestForm=Depends()):
     if not pwd_context.verify(request.password,user.password):
         return 'Invaid Password'
     #general access token
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTE)
     access_token = create_access_token(data={"sub":user.email})
-    return {"access_token":access_token,"token_type":"bearer"}
+    return TokenDto(access_token=access_token,token_type='bearer')
 

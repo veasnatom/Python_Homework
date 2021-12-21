@@ -24,6 +24,6 @@ def verify_token(token:str,credential_exception:HTTPException):
         email:str = payload.get("sub")
         if email is None:
             raise credential_exception
-        token_data = TokenData(email=email)
+        return TokenData(email=email)
     except JWTError as err:
         raise credential_exception
