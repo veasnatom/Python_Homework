@@ -52,10 +52,8 @@ def get_user_by_id(id:int, get_current_user:TokenDataDto=Depends(get_current_use
     except BaseException as err:
         return "Error: {0}".format(err)
 @user_router.put('/update_user')
-def update_user(id:int, request:TokenDataDto, get_current_user:UserDto=Depends(get_current_user)):
+def update_user(id:int, request:UserDto, get_current_user:UserDto=Depends(get_current_user)):
     try:
-        if request.id == None:
-            return 'id is required.'
         validate = ValidateUtils.validateInput(request)
         if validate[0] == True:
             with db_session:
@@ -68,6 +66,7 @@ def update_user(id:int, request:TokenDataDto, get_current_user:UserDto=Depends(g
                         if tmp != None:
                             return 'Email: '+request.email+' already exist'
                     request.password = pwd_context.hash(request.password)
+                    request.id=id
                     user.set(**dict(request))
                     return 'Updated successfully'
         else:

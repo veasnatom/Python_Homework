@@ -94,6 +94,7 @@ def update_submit_case(id:int, request: SubmitCaseDto, get_current_user:TokenDat
                 if submit_case == None:
                     return 'Id not found.'
                 else:
+                    request.id=id
                     submit_case.set(**dict(request))
                     return 'Updated successfully'
         else:
