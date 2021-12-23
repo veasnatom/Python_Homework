@@ -1,3 +1,4 @@
+from datetime import datetime
 
 from fastapi import APIRouter
 from fastapi.params import Depends
@@ -21,7 +22,8 @@ def create_submit_case(request:SubmitCaseDto, get_current_user:TokenDataDto=Depe
         validate = ValidateUtils.validateInput(request);
         if validate[0] == True:
             with db_session:
-                submit_case = submit_case_class(owner_id=user_class.get(id=request.owner_id),
+                user = user_class.get(email=get_current_user.email)
+                submit_case = submit_case_class(owner_id=request.owner_id,
                                                 street_no=request.street_no,
                                                 house_no=request.house_no,
                                                 address=request.address,
@@ -31,16 +33,22 @@ def create_submit_case(request:SubmitCaseDto, get_current_user:TokenDataDto=Depe
                                                 description=request.description,
                                                 record_type=request.record_type,
                                                 type=request.type,
-                                                created_by=user_class.get(id=request.created_by),
-                                                updated_by=user_class.get(id=request.updated_by),
-                                                created_at=request.created_at,
-                                                updated_at=request.updated_at,
-                                                deleted_at=request.deleted_at,
+                                                created_by=user,
+                                                updated_by=user,
+                                                created_at=datetime.now(),
+                                                updated_at=datetime.now(),
                                                 current_use=request.current_use,
-                                                case_status=request.case_status,
+                                                case_status='New',
                                                 instructor_date=request.instructor_date,
                                                 due_date=request.due_date,
-                                                indication_date=request.indication_date)
+                                                indication_date=request.indication_date,
+                                                building_width=request.building_width,
+                                                building_length=request.building_length,
+                                                building_area=request.building_area,
+                                                building_floor=request.building_floor,
+                                                building_story=request.building_story,
+                                                current_value_of_improvement=request.current_value_of_improvement,
+                                                total_value_of_subject_land=request.total_value_of_subject_land)
 
                 flush()
                 return {"id:",submit_case.id}
@@ -50,37 +58,44 @@ def create_submit_case(request:SubmitCaseDto, get_current_user:TokenDataDto=Depe
         return 'Error: {0}'.format(err)
 
 @submit_case_router.get('/{id}')
-def get_user_by_id(id:int, get_current_user:TokenDataDto=Depends(get_current_user)):
+def get_submit_case_by_id(id:int, get_current_user:TokenDataDto=Depends(get_current_user)):
     try:
         with db_session:
             submit_case = submit_case_class.get(id=id)
-        if submit_case == None:
-            return 'Id not found.'
-        else:
+            if submit_case == None:
+                return 'Id not found.'
+            else:
 
-            result = SubmitCaseDto(id=submit_case.id,
-                                   owner_id=submit_case.owner_id.id,
-                                   street_no=submit_case.street_no,
-                                   house_no=submit_case.house_no,
-                                   address=submit_case.address,
-                                   land_width=submit_case.land_width,
-                                   land_length=submit_case.land_length,
-                                   land_area=submit_case.land_area,
-                                   description=submit_case.description,
-                                   record_type=submit_case.record_type,
-                                   type=submit_case.type,
-                                   created_by=submit_case.created_by.id,
-                                   updated_by=submit_case.updated_by.id,
-                                   created_at=submit_case.created_at,
-                                   updated_at=submit_case.updated_at,
-                                   deleted_at=submit_case.deleted_at,
-                                   current_use=submit_case.current_use,
-                                   case_status=submit_case.case_status,
-                                   instructor_date=submit_case.instructor_date,
-                                   due_date=submit_case.due_date,
-                                   indication_date=submit_case.indication_date
-                                   )
-            return result
+                result = SubmitCaseDto(id=submit_case.id,
+                                       owner_id=submit_case.owner_id.id,
+                                       street_no=submit_case.street_no,
+                                       house_no=submit_case.house_no,
+                                       address=submit_case.address,
+                                       land_width=submit_case.land_width,
+                                       land_length=submit_case.land_length,
+                                       land_area=submit_case.land_area,
+                                       description=submit_case.description,
+                                       record_type=submit_case.record_type,
+                                       type=submit_case.type,
+                                       created_by=submit_case.created_by.id,
+                                       updated_by=submit_case.updated_by.id,
+                                       created_at=submit_case.created_at,
+                                       updated_at=submit_case.updated_at,
+                                       deleted_at=submit_case.deleted_at,
+                                       current_use=submit_case.current_use,
+                                       case_status=submit_case.case_status,
+                                       instructor_date=submit_case.instructor_date,
+                                       due_date=submit_case.due_date,
+                                       indication_date=submit_case.indication_date,
+                                       building_width=submit_case.building_width,
+                                       building_length=submit_case.building_length,
+                                       building_area=submit_case.building_area,
+                                       building_floor=submit_case.building_floor,
+                                       building_story=submit_case.building_story,
+                                       current_value_of_improvement=submit_case.current_value_of_improvement,
+                                       total_value_of_subject_land=submit_case.total_value_of_subject_land
+                                       )
+                return result
     except BaseException as err:
         return "Error: {0}".format(err)
 
@@ -94,7 +109,13 @@ def update_submit_case(id:int, request: SubmitCaseDto, get_current_user:TokenDat
                 if submit_case == None:
                     return 'Id not found.'
                 else:
+                    user = user_class.get(email=get_current_user.email)
                     request.id=id
+                    request.updated_by=user.id
+                    request.updated_at=datetime.now()
+                    del request.__dict__["created_at"]
+                    del request.__dict__["created_by"]
+                    del request.__dict__["deleted_at"]
                     submit_case.set(**dict(request))
                     return 'Updated successfully'
         else:
@@ -140,11 +161,13 @@ def get_all_submit_case(get_current_user:TokenDataDto=Depends(get_current_user))
 def delete_submit_case(id:int, get_current_user:TokenDataDto=Depends(get_current_user)):
     try:
         with db_session:
+            user = user_class.get(email=get_current_user.email)
             delete_submit_case = submit_case_class.get(id=id)
             if delete_submit_case == None:
                 return 'Id not found'
             else:
-                delete_submit_case.delete()
+                delete_submit_case.deleted_at = datetime.now()
+                delete_submit_case.updated_by = user.id
                 return 'Deleted successfully.'
     except BaseException as err:
         return "Error: {0}".format(err)

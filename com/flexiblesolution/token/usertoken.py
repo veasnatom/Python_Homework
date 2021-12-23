@@ -8,7 +8,7 @@ from com.flexiblesolution.dto.tokendatadto import TokenDataDto
 
 SECRET_KEY = 'flexiblesolution'
 ALGORITHM = 'HS256'
-ACCESS_TOKEN_EXPIRE_MINUTE = 3
+ACCESS_TOKEN_EXPIRE_MINUTE = 60
 
 def create_access_token(data:dict):
     to_encode = data.copy()

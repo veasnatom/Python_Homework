@@ -26,6 +26,13 @@ class SubmitCaseDto(BaseModel):
     instructor_date : Optional[datetime]
     due_date : Optional[datetime]
     indication_date : Optional[datetime]
+    building_width : Optional[float]
+    building_length : Optional[float]
+    building_area : Optional[float]
+    building_floor : Optional[int]
+    building_story : Optional[int]
+    current_value_of_improvement : Optional[float]
+    total_value_of_subject_land : Optional[float]
 
     class Config:
         updated_by:Optional[int]
