@@ -1,3 +1,4 @@
+from datetime import datetime
 from xml.dom import UserDataHandler
 
 from fastapi import APIRouter, Depends
@@ -29,8 +30,8 @@ def create_user(request:UserDto):
                 user = user_class.get(email=request.email)
                 if user != None:
                     return 'Email: '+request.email+' already exist'
-                user = user_class(name=request.name, email=request.email, phone=request.phone, password=pwd_context.hash(request.password), created_at=request.created_at,
-                      updated_at=request.updated_at)
+                user = user_class(name=request.name, email=request.email, phone=request.phone, password=pwd_context.hash(request.password), created_at=datetime.now(),
+                      updated_at=datetime.now())
                 flush()
             return {"id":user.id}
         else:
@@ -52,7 +53,7 @@ def get_user_by_id(id:int, get_current_user:TokenDataDto=Depends(get_current_use
     except BaseException as err:
         return "Error: {0}".format(err)
 @user_router.put('/update_user')
-def update_user(id:int, request:UserDto, get_current_user:UserDto=Depends(get_current_user)):
+def update_user(id:int, request:UserDto, get_current_user:TokenDataDto=Depends(get_current_user)):
     try:
         validate = ValidateUtils.validateInput(request)
         if validate[0] == True:
@@ -67,6 +68,8 @@ def update_user(id:int, request:UserDto, get_current_user:UserDto=Depends(get_cu
                             return 'Email: '+request.email+' already exist'
                     request.password = pwd_context.hash(request.password)
                     request.id=id
+                    request.updated_at = datetime.now()
+                    del request.__dict__["created_at"]
                     user.set(**dict(request))
                     return 'Updated successfully'
         else:

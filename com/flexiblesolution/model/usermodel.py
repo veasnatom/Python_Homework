@@ -11,7 +11,6 @@ def getUser(db):
         email = Required(str)
         phone = Required(str)
         password = Required(str)
-        remember_token = Optional(str)
         created_at = Required(datetime)
         updated_at = Required(datetime)
         owner_id = Set('SubmitCaseModel')

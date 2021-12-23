@@ -41,18 +41,18 @@ class ValidateUtils:
         try:
             phone_number = phonenumbers.parse(phone)
         except BaseException as err:
-            return False,'Invalid Phone'
+            return False,'Invalid Phone (+85512345678)'
         if phonenumbers.is_possible_number(phone_number):
             return True,None
         else:
-            return False,'Invalid Phone'
+            return False,'Invalid Phone (+85512345678)'
     @staticmethod
     def __validateEmail(email:str):
         regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
         if (re.fullmatch(regex, email)):
             return True,None
         else:
-            return False,'Invalid Email'
+            return False,'Invalid Email (example@mail.com)'
 
 
 #end user validate section
